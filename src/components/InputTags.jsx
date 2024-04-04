@@ -19,7 +19,8 @@ const InputTags = forwardRef(({ defaultValue = [], ...props }, inputRef) => {
 
   // delete tag
   const handleDelete = (value) => {
-    const newtags = tags.filter((val) => val !== value);
+    const newtags = tags.filter((val) => val.replace('_', ' ') !== value);
+    console.log(value)
     setTags(newtags);
   };
   return (

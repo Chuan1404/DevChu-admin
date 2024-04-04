@@ -31,8 +31,7 @@ const FileProcess = ({ data, handleDelete}) => {
     form.append("title", titleRef.current.value);
     form.append("price", priceRef.current.value);
     form.append("tags", tagRef.current.value);
-    form.append("probs", JSON.stringify(probs));
-   
+    form.append("probs", JSON.stringify(probs).slice(1, -1));
 
     let response = await callWithToken(`${API}/file/upload`, {
       method: "POST",
