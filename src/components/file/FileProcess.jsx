@@ -7,7 +7,6 @@ import { callWithToken } from "../../utils/fetchData";
 import InputTags from "../InputTags";
 import { useDispatch } from "react-redux";
 import {openAlert} from '../../store/slices/pageSlice'
-import queryLocation from '../../utils/queryLocation'
 
 const FileProcess = ({ data, handleDelete}) => {
   let tagRef = useRef(null);
