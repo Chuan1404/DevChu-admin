@@ -5,6 +5,7 @@ import {
   EmployeeCreate,
   FileCreate,
   FileList,
+  FileExtract,
   Mail,
   Statistic,
   User
@@ -29,6 +30,7 @@ export default function Router() {
       <Route path="/file/">
         <Route path="create" element={<FileCreate />} />
         <Route path="list" element={<FileList />} />
+        <Route path="extract" element={<FileExtract />} />
       </Route>
       <Route path="/mail" element={<Mail />} />
       <Route path="/statistic" element={<Statistic />} />

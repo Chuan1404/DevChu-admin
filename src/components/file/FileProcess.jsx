@@ -1,28 +1,41 @@
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import loading from "../../assets/images/loading2.svg";
 import notSupport from "../../assets/images/errors/not-support.gif";
 import { API } from "../../assets/js/constants";
 import { callWithToken } from "../../utils/fetchData";
+import { utilsService } from "../../services";
 import InputTags from "../InputTags";
 import { useDispatch } from "react-redux";
-import {openAlert} from '../../store/slices/pageSlice'
+import { openAlert } from "../../store/slices/pageSlice";
 
-const FileProcess = ({ data, handleDelete}) => {
+const FileProcess = ({ handleDelete, ...props }) => {
   let tagRef = useRef(null);
   let titleRef = useRef(null);
   let priceRef = useRef(0);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState(props.data)
+  const [tags, setTags] = useState({})
 
   // upload file to server
   const handleSubmit = async () => {
-    if(titleRef.current.value == '' || priceRef.current.value < 10000 || tagRef.current.value == '') return
-     // get final probs
-     let probs = tagRef.current.value.split(',').map(item => {
-      let index = data.result.names.indexOf(item)
-      return index >= 0? data.result.probs[index]: 1
-    })
+    if (
+      titleRef.current.value == "" ||
+      priceRef.current.value < 10000 ||
+      tagRef.current.value == ""
+    )
+      return;
+    let tags = {
+      names: [...data.result.predict.names, ...data.result.colors.names],
+      probs: [...data.result.predict.probs, ...data.result.colors.probs],
+    };
+
+    // get final probs
+    let probs = tagRef.current.value.split(",").map((item) => {
+      let index = tags.names.indexOf(item);
+      return index >= 0 ? tags.probs[index] : 1;
+    });
 
     setIsLoading(true);
     let form = new FormData();
@@ -40,22 +53,64 @@ const FileProcess = ({ data, handleDelete}) => {
     if (!response.error) {
       handleDelete({ ...data, message: "uploaded" });
       setIsLoading(false);
-      dispatch(
-        openAlert({ type: "success", message: "Upload thành công" })
-      );
-    } 
-    else {
+      dispatch(openAlert({ type: "success", message: "Upload thành công" }));
+    } else {
       handleDelete({ ...data, message: "failed" });
       setIsLoading(false);
-      dispatch(
-        openAlert({ type: "error", message: "Upload thất bại" })
-      );
+      dispatch(openAlert({ type: "error", message: "Upload thất bại" }));
     }
   };
+
+  const hexToRgb = (hex) => {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : null;
+  };
+
+  const getColor = async () => {
+    if (!window.EyeDropper) {
+      alert("Your browser does not support this feature");
+    }
+
+    // Creating a new instance of EyeDropper
+    let cloneData = {...data}
+    const eyeDropper = new window.EyeDropper();
+    let colorHex = await eyeDropper.open()
+    let result = await utilsService.getColor(hexToRgb(colorHex.sRGBHex))
+    let currentColors = !!data.result ? data.result.colors : []
+    currentColors.names = [...currentColors.names, result.cname] 
+    currentColors.probs = [...currentColors.probs, 1] 
+    currentColors.values = [...currentColors.values, result.cvalue] 
+
+    cloneData.result.colors = currentColors
+    setData(cloneData)
+  };
+
+  
+
+  useEffect(() => {
+    let { result } = data;
+    let newTags = {};
+    if (!!result.predict && !!result.colors) {
+      result.predict.values = result.predict.names.map(() => "");
+      newTags = {
+        names: [...result.predict.names, ...result.colors.names],
+        probs: [...result.predict.probs, ...result.colors.probs],
+        colors: [...result.predict.values, ...result.colors.values],
+      };
+    }
+    setTags({...newTags})
+  }, [data])
+  console.log(tags)
   return (
     <Stack className="FileProcess" direction={"row"} spacing={2}>
       <Box className="file">
-        {data?.file.type.startsWith("image/") ? (
+        {data?.file?.type.startsWith("image/") ? (
           <img
             id="preview"
             src={URL.createObjectURL(data.file)}
@@ -87,15 +142,20 @@ const FileProcess = ({ data, handleDelete}) => {
               size="small"
               sx={{ marginBottom: 4, width: 300 }}
             />
-            
-             <TextField
+
+            <TextField
               inputRef={priceRef}
               type="number"
               label="Giá (Tối thiểu 10.000 VNĐ)"
               size="small"
               sx={{ marginBottom: 4, width: 300 }}
             />
-            <InputTags ref={tagRef} defaultValue={data?.result.names}/>
+
+            <InputTags
+              ref={tagRef}
+              defaultValue={tags?.names}
+              colors={tags?.colors}
+            />
 
             <Stack
               direction={"row"}
@@ -105,6 +165,9 @@ const FileProcess = ({ data, handleDelete}) => {
             >
               <Button variant="text" color="secondary" onClick={handleDelete}>
                 Xóa
+              </Button>
+              <Button variant="text" color="secondary" onClick={getColor}>
+                Lấy màu từ hình ảnh
               </Button>
               <Button variant="contained" onClick={handleSubmit}>
                 Xác nhận

@@ -1,12 +1,9 @@
 import {
   ArrowRight,
-  BarChart,
-  ChatBubble,
   CloudDownload,
   Dashboard,
   Group,
-  KeyboardArrowDown,
-  Mail,
+  KeyboardArrowDown
 } from "@mui/icons-material";
 import {
   Box,
@@ -19,9 +16,9 @@ import {
 } from "@mui/material";
 import classnames from "classnames";
 import { forwardRef, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import Authenticated from "./Authenticated";
-import { useSelector } from "react-redux";
 
 const NavBar = forwardRef((props, ref) => {
   const theme = useTheme();
@@ -53,6 +50,7 @@ const NavBar = forwardRef((props, ref) => {
         children: [
           { title: "Thêm File", path: "/create" },
           { title: "Danh sách File", path: "/list" },
+          { title: "Trích xuất chữ ký", path: "/extract" },
         ],
         allowRoles: ["ROLE_ADMIN", "ROLE_EDITOR"],
       },
@@ -92,9 +90,6 @@ const NavBar = forwardRef((props, ref) => {
         ref={ref}
         bgcolor={theme.palette.secondary.main}
       >
-        <Box className='navBar__close'>
-          close
-        </Box>
         <List className="navBar__list" disablePadding>
           {routeData.map((item, index) => {
             let roles = item.allowRoles?.filter((role) =>

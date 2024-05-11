@@ -9,6 +9,7 @@ import Auth from "./Auth";
 import FileCreate from "./file/FileCreate";
 import FileList from "./file/FileList";
 import BarChart from "../components/BarChart";
+import FileExtract from "./file/FileExtract";
 
 export {
     Chat,
@@ -21,5 +22,6 @@ export {
     Auth,
     FileCreate,
     FileList,
-    BarChart
+    BarChart,
+    FileExtract
 }

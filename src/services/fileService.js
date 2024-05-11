@@ -1,5 +1,5 @@
 import { ADMIN_API, API } from "../assets/js/constants";
-import { callWithToken, getData } from "../utils/fetchData";
+import { callWithToken, getData, postFile } from "../utils/fetchData";
 
 const fileService = {
   getFiles(search = "") {
@@ -9,6 +9,13 @@ const fileService = {
 
   updateFiles(id, form) {
     return callWithToken(`${API}/file/update/${id}`, {
+      method: "POST",
+      body: form,
+    })
+  },
+
+  extractFile(form) {
+    return postFile(`${ADMIN_API}/file/extract`, {
       method: "POST",
       body: form,
     })

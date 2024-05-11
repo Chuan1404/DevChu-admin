@@ -13,15 +13,17 @@ const FileUploader = ({ width = "100%" }) => {
 
   // add file need to load
   const handleChange = (e) => {
-    let currentFiles = [...files];
-    [...e.target.files].forEach((file) => {
-      currentFiles.unshift({
-        id: uuidv4(),
-        file,
+    if (e.target.files?.length > 0) {
+      let currentFiles = [...files];
+      [...e.target.files].forEach((file) => {
+        currentFiles.unshift({
+          id: uuidv4(),
+          file,
+        });
       });
-    });
-    setFiles(currentFiles);
-    setIsLoading(true);
+      setFiles(currentFiles);
+      setIsLoading(true);
+    }
   };
 
   // delete handled file

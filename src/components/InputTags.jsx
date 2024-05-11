@@ -1,9 +1,9 @@
 import { Close } from "@mui/icons-material";
 import { Chip, Stack, TextField, Typography } from "@mui/material";
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 
-const InputTags = forwardRef(({ defaultValue = [], ...props }, inputRef) => {
-  const [tags, setTags] = useState(defaultValue);
+const InputTags = forwardRef(({ defaultValue = [], colors = [], ...props }, inputRef) => {
+  const [tags, setTags] = useState([...defaultValue]);
   const tagRef = useRef(null);
 
   // add tag
@@ -20,14 +20,18 @@ const InputTags = forwardRef(({ defaultValue = [], ...props }, inputRef) => {
   // delete tag
   const handleDelete = (value) => {
     const newtags = tags.filter((val) => val.replace('_', ' ') !== value);
-    console.log(value)
     setTags(newtags);
   };
+
+  useEffect(() => {
+    setTags([...defaultValue])
+  }, [defaultValue])
+
   return (
     <Stack flexGrow={1} width={"100%"} bgcolor={"white"}>
       <form onSubmit={handleOnSubmit}>
-        {tags.map((data, index) => (
-          <Tag handleDelete={handleDelete} data={data.replace('_', ' ')} key={index} />
+        {tags?.map((data, index) => (
+          <Tag handleDelete={handleDelete} bgColor={colors[index]} data={data.replace('_', ' ')} key={index} />
         ))}
         <TextField
           inputRef={tagRef}
@@ -49,15 +53,15 @@ const InputTags = forwardRef(({ defaultValue = [], ...props }, inputRef) => {
   );
 });
 
-function Tag({ data, handleDelete }) {
+function Tag({ data, handleDelete, bgColor }) {
   return (
     <Chip
-      sx={{ margin: "0 0.5rem 0.5rem 0" }}
+      sx={{ margin: "0 0.5rem 0.5rem 0", backgroundColor: bgColor }}
       label={
         <Stack direction={"row"} alignItems={"center"} spacing={1}>
-          <Typography>{data}</Typography>
+          <Typography style={{color: 'white', mixBlendMode: 'difference'}}>{data}</Typography>
           <Close
-            sx={{ cursor: "pointer", fontSize: "1rem" }}
+            style={{ cursor: "pointer", fontSize: "1rem", color: 'white', mixBlendMode: 'difference'  }}
             onClick={() => {
               handleDelete(data);
             }}
