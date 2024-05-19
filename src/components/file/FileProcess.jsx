@@ -106,7 +106,6 @@ const FileProcess = ({ handleDelete, ...props }) => {
     }
     setTags({...newTags})
   }, [data])
-  console.log(tags)
   return (
     <Stack className="FileProcess" direction={"row"} spacing={2}>
       <Box className="file">
@@ -155,6 +154,8 @@ const FileProcess = ({ handleDelete, ...props }) => {
               ref={tagRef}
               defaultValue={tags?.names}
               colors={tags?.colors}
+              data={data}
+              setData={setData}
             />
 
             <Stack
